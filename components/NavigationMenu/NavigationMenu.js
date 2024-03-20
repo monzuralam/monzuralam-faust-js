@@ -4,6 +4,7 @@ import Link from 'next/link';
 import styles from './NavigationMenu.module.scss';
 import stylesFromWP from './NavigationMenuClassesFromWP.module.scss';
 import { flatListToHierarchical } from '@faustwp/core';
+import { useRouter } from 'next/router';
 
 let cx = classNames.bind(styles);
 let cxFromWp = classNames.bind(stylesFromWP);
@@ -12,6 +13,8 @@ export default function NavigationMenu({ menuItems, className }) {
   if (!menuItems) {
     return null;
   }
+
+  const router = useRouter();
 
   // Based on https://www.wpgraphql.com/docs/menus/#hierarchical-data
   const hierarchicalMenuItems = flatListToHierarchical(menuItems);
@@ -28,7 +31,7 @@ export default function NavigationMenu({ menuItems, className }) {
           }
 
           return (
-            <li key={id} className={cxFromWp(cssClasses)}>
+            <li key={id} className={cxFromWp({ [cssClasses]: true, 'active': path === router.asPath + '/' })}>
               <Link href={path ?? ''}>{label ?? ''}</Link>
               {children.length ? renderMenu(children) : null}
             </li>

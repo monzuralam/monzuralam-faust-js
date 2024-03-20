@@ -10,6 +10,7 @@ import {
   Hero,
   SEO,
 } from '../components';
+import { Html } from 'next/document';
 
 export default function Component() {
   const { data } = useQuery(Component.query, {
@@ -17,9 +18,12 @@ export default function Component() {
   });
 
   const { title: siteTitle, description: siteDescription } =
-    data?.generalSettings;
+  data?.generalSettings;
+  const { content } = data?.pageBy;
   const primaryMenu = data?.headerMenuItems?.nodes ?? [];
   const footerMenu = data?.footerMenuItems?.nodes ?? [];
+
+  
 
   return (
     <>
@@ -31,11 +35,7 @@ export default function Component() {
       />
       <Main>
         <Container>
-          <Hero title={'Front Page'} />
-          <div className="text-center">
-            <p>This page is utilizing the "front-page" WordPress template.</p>
-            <code>wp-templates/front-page.js</code>
-          </div>
+          <div dangerouslySetInnerHTML={{ __html: content }}></div>
         </Container>
       </Main>
       <Footer title={siteTitle} menuItems={footerMenu} />
@@ -57,6 +57,11 @@ Component.query = gql`
       nodes {
         ...NavigationMenuItemFragment
       }
+    }
+    pageBy(uri: "/") {
+      isFrontPage
+      title(format: RENDERED)
+      content(format: RENDERED)
     }
     footerMenuItems: menuItems(where: { location: $footerLocation }) {
       nodes {
